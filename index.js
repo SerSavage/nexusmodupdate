@@ -5,7 +5,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-const NEXUS_API_URL = 'https://api.nexusmods.com/v1/games/starwarsbattlefront22017/mods/11814.json'; // Replace YOUR_MOD_ID
+const NEXUS_API_URL = 'https://api.nexusmods.com/v1/games/starwarsbattlefront22017/mods/11814.json';
 const NEXUS_API_KEY = process.env.NEXUS_API_KEY;
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const POLL_INTERVAL = 60000; // Poll every 60 seconds
@@ -15,14 +15,23 @@ let lastUpdated = null;
 
 // Basic endpoint to satisfy Render's Web Service requirement
 app.get('/', (req, res) => {
-  res.send('Nexus Mod Monitor is running!');
+  res.send('Nexus Mod Monitor for Mod ID 11814 is running!');
 });
 
 async function pollNexusAPI() {
+  if (!NEXUS_API_KEY) {
+    console.error('NEXUS_API_KEY is not set in environment variables');
+    return;
+  }
+  if (!DISCORD_WEBHOOK_URL) {
+    console.error('DISCORD_WEBHOOK_URL is not set in environment variables');
+    return;
+  }
+
   try {
     const response = await axios.get(NEXUS_API_URL, {
       headers: {
-        'API-Key': NEXUS_API_KEY
+        'apikey': NEXUS_API_KEY // Correct header for Nexus Mods API
       },
       params: lastUpdated ? { updated_since: lastUpdated } : {}
     });
@@ -32,14 +41,19 @@ async function pollNexusAPI() {
       console.log('Mod updated:', modData);
       lastUpdated = modData.updated_timestamp;
 
-      await axios.post(DISCORD_WEBHOOK_URL, {
-        content: `📢 Mod Update (ID YOUR_MOD_ID): ${modData.name} updated at ${new Date(lastUpdated * 1000).toISOString()}`
-      });
+      try {
+        await axios.post(DISCORD_WEBHOOK_URL, {
+          content: `📢 Mod Update (ID 11814): ${modData.name} updated at ${new Date(lastUpdated * 1000).toISOString()}`
+        });
+        console.log('Discord notification sent');
+      } catch (discordErr) {
+        console.error('Error sending Discord webhook:', discordErr.message);
+      }
     } else {
-      console.log('No new updates for mod ID YOUR_MOD_ID');
+      console.log('No new updates for mod ID 11814');
     }
   } catch (err) {
-    console.error('Error polling Nexus Mods API:', err.message);
+    console.error('Error polling Nexus Mods API:', err.message, err.response?.status, err.response?.data);
   }
 }
 
