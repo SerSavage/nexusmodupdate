@@ -43,7 +43,24 @@ async function pollNexusAPI() {
 
       try {
         await axios.post(DISCORD_WEBHOOK_URL, {
-          content: `📢 Mod Update (ID 11814): ${modData.name} updated at ${new Date(lastUpdated * 1000).toISOString()}`
+          content: "📡 Incoming transmission from 🔧 SYSTEM UPDATE...   🛠️ STATUS: Deployed and operational.  📍 Location: Central Repository of NEXUS <<Holocron Archives>>  📄 End of transmission. May the source be with you.",
+          embeds: [
+            {
+              title: `Holocron Update: ${modData.name} (ID: ${modData.mod_id})`,
+              description: `A new version of **${modData.name}** has been detected in the Nexus Archives.`,
+              color: 0xFFD700, // Gold color for a Star Wars kyber crystal theme
+              fields: [
+                { name: "Version", value: modData.version || "N/A", inline: true },
+                { name: "Updated", value: new Date(modData.updated_timestamp * 1000).toISOString().split('.')[0] + 'Z', inline: true },
+                { name: "Author", value: modData.author || "Unknown", inline: true },
+                { name: "Downloads", value: `${modData.mod_downloads} (${modData.mod_unique_downloads} unique)`, inline: true },
+                { name: "Summary", value: modData.summary.replace(/<br \/>/g, '\n').substring(0, 200) + (modData.summary.length > 200 ? '...' : '') },
+              ],
+              thumbnail: { url: modData.picture_url || '' },
+              footer: { text: "Retrieved from Nexus Mods Archives" },
+              timestamp: new Date().toISOString()
+            }
+          ]
         });
         console.log('Discord notification sent');
       } catch (discordErr) {
