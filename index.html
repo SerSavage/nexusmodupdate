@@ -5,7 +5,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-const NEXUS_API_URL = 'https://api.nexusmods.com/v1/games/starwarsbattlefront22017/mods/YOUR_MOD_ID.json'; // Replace YOUR_MOD_ID
+const NEXUS_API_URL = 'https://api.nexusmods.com/v1/games/starwarsbattlefront22017/mods/11814.json'; // Replace YOUR_MOD_ID
 const NEXUS_API_KEY = process.env.NEXUS_API_KEY;
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const POLL_INTERVAL = 60000; // Poll every 60 seconds
