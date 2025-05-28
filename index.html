@@ -1,0 +1,52 @@
+const express = require('express');
+const axios = require('axios');
+require('dotenv').config();
+
+const app = express();
+app.use(express.json());
+
+const NEXUS_API_URL = 'https://api.nexusmods.com/v1/games/starwarsbattlefront22017/mods/YOUR_MOD_ID.json'; // Replace YOUR_MOD_ID
+const NEXUS_API_KEY = process.env.NEXUS_API_KEY;
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+const POLL_INTERVAL = 60000; // Poll every 60 seconds
+const PORT = process.env.PORT || 10000; // Render's default port
+
+let lastUpdated = null;
+
+// Basic endpoint to satisfy Render's Web Service requirement
+app.get('/', (req, res) => {
+  res.send('Nexus Mod Monitor is running!');
+});
+
+async function pollNexusAPI() {
+  try {
+    const response = await axios.get(NEXUS_API_URL, {
+      headers: {
+        'API-Key': NEXUS_API_KEY
+      },
+      params: lastUpdated ? { updated_since: lastUpdated } : {}
+    });
+
+    const modData = response.data;
+    if (modData && modData.updated_timestamp && (!lastUpdated || modData.updated_timestamp > lastUpdated)) {
+      console.log('Mod updated:', modData);
+      lastUpdated = modData.updated_timestamp;
+
+      await axios.post(DISCORD_WEBHOOK_URL, {
+        content: `📢 Mod Update (ID YOUR_MOD_ID): ${modData.name} updated at ${new Date(lastUpdated * 1000).toISOString()}`
+      });
+    } else {
+      console.log('No new updates for mod ID YOUR_MOD_ID');
+    }
+  } catch (err) {
+    console.error('Error polling Nexus Mods API:', err.message);
+  }
+}
+
+// Start polling
+setInterval(pollNexusAPI, POLL_INTERVAL);
+pollNexusAPI(); // Run immediately on startup
+
+app.listen(PORT, () => {
+  console.log(`Nexus Mod Monitor running on port ${PORT}`);
+});
