@@ -43,7 +43,7 @@ async function pollNexusAPI() {
 
       try {
         await axios.post(DISCORD_WEBHOOK_URL, {
-          content: "📡 Incoming transmission from 🔧 SYSTEM UPDATE...   🛠️ STATUS: Deployed and operational.  📍 Location: Central Repository of NEXUS <<Holocron Archives>>  📄 End of transmission. May the source be with you.",
+          content: "📡 Incoming transmission from 🔧 SYSTEM UPDATE...   🛠️ STATUS: Deployed and operational.  📍 Location: Central Repository of NEXUS <<Holocron Archives>>  📄 End of transmission. May the source be with you.  [Check #downloads](https://discord.com/channels/1361838672265089225/1363402560756781207)",
           embeds: [
             {
               title: `Holocron Update: ${modData.name} (ID: ${modData.mod_id})`,
